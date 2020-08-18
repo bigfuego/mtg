@@ -76,10 +76,6 @@ namespace MTG
 
             var probabilityCalculator = new ManaTurnProbabilityCalculator(Deck, c => c.Cost);
             probabilityCalculator.SimulateTurn();
-            {
-                System.Console.WriteLine(kvp.Key);
-                System.Console.WriteLine((kvp.Value));
-            }
         }
     }
 }

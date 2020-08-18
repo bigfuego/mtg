@@ -63,7 +63,7 @@ namespace MTG
             int r = _random.Next(Count);
             foreach(var key in deckDistribution.Keys)
             {
-                var inDeck = deckDistribution[key] - hand.CardDistribution[key];
+                var inDeck = deckDistribution[key] - hand[key];
                 if (inDeck >= r)
                 {
                     return key;
