@@ -10,23 +10,26 @@ namespace MTG
         MetaDeck metadeck;
         Dictionary<Hand, BigInteger> handDistribution;
         List<MetaGame> MetaGames;
-        public List<Dictionary<string, Dictionary<int, BigInteger>>> StatsPerTurn = new List<Dictionary<string, Dictionary<int, BigInteger>>>();
+        public ManaTurnStats Stats;
+        private int turn = 0;
 
         public ManaTurnProbabilityCalculator(Deck deck, Func<Card, int> groupBy)
         {
             this.metadeck = new MetaDeck(deck, groupBy);
-            handDistribution = metadeck.HandDistribution();
-            MetaGames = handDistribution.Select(hd => new MetaGame(this.metadeck, new Board(), hd.Key, hd.Value)).ToList();
+            this.handDistribution = metadeck.HandDistribution();
+            this.MetaGames = handDistribution.Select(hd => new MetaGame(this.metadeck, new Board(), hd.Key, hd.Value)).ToList();
+            this.Stats = new ManaTurnStats();
         }
 
         public void SimulateTurn()
         {
             foreach (var game in MetaGames)
             {
+                var turn = game.NewTurn();
                 game.Draw();
 
                 if (GetLandToPlay(game, out int land))
-                    game.PlayLand(land);
+                    game.PlayLand(land);    
 
                 var nonlandsToPlay = GetNonLandsToPlay(game);
                 game.PlayNonLands(nonlandsToPlay);
@@ -35,6 +38,9 @@ namespace MTG
                     game.Discard(discard);
                 }
             }
+            Stats.AddLandStats(MetaGames, turn);
+            Stats.AddSpendStats(MetaGames, turn);
+            turn++;
         }
 
         public List<MetaGame> CoalesceMetaGames()

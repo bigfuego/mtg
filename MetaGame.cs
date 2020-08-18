@@ -8,6 +8,7 @@ namespace MTG
         public MetaDeck Deck;
         public Board Board;
         public Hand Hand;
+        public int turn = 0;
 
         public BigInteger Microstates;
 
@@ -19,6 +20,11 @@ namespace MTG
             this.Microstates = microstates;
         }
 
+        public int NewTurn()
+        {
+            turn++;
+            return turn;
+        }
         public bool Draw()
         {
                 var key = Deck.Draw(Hand);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace MTG
 {
@@ -7,27 +8,27 @@ namespace MTG
         static void Main(string[] args)
         {
             var Deck = new Deck(new[] {
-                new Card{CardType=CardType.LAND},
-                new Card{CardType=CardType.LAND},
-                new Card{CardType=CardType.LAND},
-                new Card{CardType=CardType.LAND},
-                new Card{CardType=CardType.LAND},
-                new Card{CardType=CardType.LAND},
-                new Card{CardType=CardType.LAND},
-                new Card{CardType=CardType.LAND},
-                new Card{CardType=CardType.LAND},
-                new Card{CardType=CardType.LAND},
-                new Card{CardType=CardType.LAND},
-                new Card{CardType=CardType.LAND},
-                new Card{CardType=CardType.LAND},
-                new Card{CardType=CardType.LAND},
-                new Card{CardType=CardType.LAND},
-                new Card{CardType=CardType.LAND},
-                new Card{CardType=CardType.LAND},
-                new Card{CardType=CardType.LAND},
-                new Card{CardType=CardType.LAND},
-                new Card{CardType=CardType.LAND},
-                new Card{CardType=CardType.LAND},
+                new Card{CardType=CardType.PLAINS},
+                new Card{CardType=CardType.PLAINS},
+                new Card{CardType=CardType.PLAINS},
+                new Card{CardType=CardType.PLAINS},
+                new Card{CardType=CardType.PLAINS},
+                new Card{CardType=CardType.PLAINS},
+                new Card{CardType=CardType.PLAINS},
+                new Card{CardType=CardType.PLAINS},
+                new Card{CardType=CardType.PLAINS},
+                new Card{CardType=CardType.PLAINS},
+                new Card{CardType=CardType.PLAINS},
+                new Card{CardType=CardType.PLAINS},
+                new Card{CardType=CardType.PLAINS},
+                new Card{CardType=CardType.PLAINS},
+                new Card{CardType=CardType.PLAINS},
+                new Card{CardType=CardType.PLAINS},
+                new Card{CardType=CardType.PLAINS},
+                new Card{CardType=CardType.PLAINS},
+                new Card{CardType=CardType.PLAINS},
+                new Card{CardType=CardType.PLAINS},
+                new Card{CardType=CardType.PLAINS},
                 new Card{CardType=CardType.NONLAND, Cost=1},
                 new Card{CardType=CardType.NONLAND, Cost=1},
                 new Card{CardType=CardType.NONLAND, Cost=1},
@@ -76,6 +77,36 @@ namespace MTG
 
             var probabilityCalculator = new ManaTurnProbabilityCalculator(Deck, c => c.Cost);
             probabilityCalculator.SimulateTurn();
+            probabilityCalculator.SimulateTurn();
+            probabilityCalculator.SimulateTurn();
+            probabilityCalculator.SimulateTurn();
+
+            var stats = probabilityCalculator.Stats;
+            var landStats = stats.GetLandStats();
+            var spendStats = stats.GetSpendStats();
+
+            var count = 0;
+            foreach(var turn in landStats)
+            {
+                System.Console.WriteLine(count);
+                count++;
+                foreach(var land in turn.OrderBy(x => x.Key))
+                {
+                    System.Console.WriteLine($"{land.Key}: {land.Value}");
+                }
+            }
+            
+            count = 0;
+            foreach(var turn in spendStats)
+            {
+                System.Console.WriteLine(count);
+                count++;
+                foreach(var spend in turn.OrderBy(x => x.Key))
+                {
+                    System.Console.WriteLine($"{spend.Key}: {spend.Value}");
+                }
+            }
+
         }
     }
 }
