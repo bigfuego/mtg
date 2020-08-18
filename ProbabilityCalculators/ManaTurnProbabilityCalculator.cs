@@ -55,7 +55,7 @@ namespace MTG
             var result = new List<int>();
             var availableMana = game.Board.Lands.Sum(l => l.Value);
             //Greedy.  Wrong.  With 5 mana, this could play a 4 instead of a 2 and 3.  
-            foreach (var cost in game.Hand.CardDistribution.Keys.OrderByDescending(x => x))
+            foreach (var cost in game.Hand.CardDistribution.Keys.Where(c => c > 0).OrderByDescending(x => x))
             {
                 var played = 0;
                 while (cost <= availableMana && played < game.Hand.CardDistribution[cost])
