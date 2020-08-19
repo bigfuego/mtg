@@ -43,5 +43,23 @@ namespace MTG
             get { return CardDistribution.ContainsKey(i) ? CardDistribution[i] : 0; }
             set { CardDistribution[i] = value; }
         }
+
+        public override bool Equals(Object obj)
+        {
+            if (!(obj is Hand)) return false;
+
+            Hand h = (Hand) obj;
+            return CardDistribution.Count == h.CardDistribution.Count && !CardDistribution.Except(h.CardDistribution).Any();
+        }
+
+        public override int GetHashCode()
+        {   
+            int result = 0;
+            foreach(var kvp in CardDistribution)
+            {
+                result += kvp.Value * (int)Math.Pow(10, kvp.Key);
+            }
+            return result;
+        }
     }
 }

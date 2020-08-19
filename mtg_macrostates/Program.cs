@@ -70,12 +70,20 @@ namespace MTG
                 new Card{CardType=CardType.NONLAND, Cost=6},
                 new Card{CardType=CardType.NONLAND, Cost=6},
                 new Card{CardType=CardType.NONLAND, Cost=7},
-
-
-
             });
 
-            var probabilityCalculator = new ManaTurnProbabilityCalculator(Deck, c => c.Cost);
+            var morePredictableDeck =  new Deck(new[] {
+                new Card{CardType=CardType.PLAINS},
+                new Card{CardType=CardType.NONLAND, Cost=1},
+                new Card{CardType=CardType.NONLAND, Cost=1},
+                new Card{CardType=CardType.NONLAND, Cost=1},
+                new Card{CardType=CardType.NONLAND, Cost=1},
+                new Card{CardType=CardType.NONLAND, Cost=1},
+                new Card{CardType=CardType.NONLAND, Cost=1},
+                new Card{CardType=CardType.NONLAND, Cost=1},
+            });
+
+            var probabilityCalculator = new ManaTurnProbabilityCalculator(morePredictableDeck, c => c.Cost);
             probabilityCalculator.SimulateTurn();
             probabilityCalculator.SimulateTurn();
             probabilityCalculator.SimulateTurn();

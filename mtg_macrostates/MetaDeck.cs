@@ -7,13 +7,12 @@ namespace MTG
 {
     public class MetaDeck
     {
-        Deck deck;
-        Dictionary<int, int> deckDistribution = null;
-        public int Count => deck.Count;
+        public Dictionary<int, int> deckDistribution = null;
+        public int Count;
 
         public MetaDeck(Deck deck, Func<Card, int> groupFunc)
         {
-            this.deck = deck;
+            this.Count = deck.Count;
             deckDistribution = deck.GroupBy(groupFunc);
         }
 
