@@ -8,7 +8,6 @@ namespace MTG
     public class ManaTurnProbabilityCalculator
     {
         MetaDeck metadeck;
-        Dictionary<Hand, BigInteger> handDistribution;
         List<MetaGame> MetaGames;
         public ManaTurnStats Stats;
         private int turn = 0;
@@ -16,13 +15,14 @@ namespace MTG
         public ManaTurnProbabilityCalculator(Deck deck, Func<Card, int> groupBy)
         {
             this.metadeck = new MetaDeck(deck, groupBy);
-            this.handDistribution = metadeck.HandDistribution();
+            var handDistribution = metadeck.HandDistribution();
             this.MetaGames = handDistribution.Select(hd => new MetaGame(this.metadeck, new Board(), hd.Key, hd.Value)).ToList();
             this.Stats = new ManaTurnStats();
         }
 
         public void SimulateTurn()
         {
+            MetaGames = MetaGames.SelectMany(mg => mg.Draw()).ToList();
             foreach (var game in MetaGames)
             {
                 var turn = game.NewTurn();
@@ -43,7 +43,7 @@ namespace MTG
             turn++;
         }
 
-        public List<MetaGame> CoalesceMetaGames()
+        public void CoalesceMetaGames()
         {
             throw new NotImplementedException("This is an optimization for later");
         }

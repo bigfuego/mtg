@@ -27,6 +27,7 @@ namespace MTG
         {
             return new Hand(CardDistribution.ToDictionary(kvp => kvp.Key, kvp => kvp.Value));
         }
+        
         public Hand Add(int property, int number)
         {
             this[property] = this[property] + number;

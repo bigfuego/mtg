@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 
 namespace MTG
@@ -9,7 +10,6 @@ namespace MTG
         public Board Board;
         public Hand Hand;
         public int turn = 0;
-
         public BigInteger Microstates;
 
         public MetaGame(MetaDeck deck, Board board, Hand hand, BigInteger microstates)
@@ -25,13 +25,11 @@ namespace MTG
             turn++;
             return turn;
         }
-        public bool Draw()
+
+        public IEnumerable<MetaGame> Draw() //Drawing creates a whole new set of metagames
         {
-                var key = Deck.Draw(Hand);
-                if (key < 0)
-                    return false;
-                Hand.Add(key, 1);
-                return true;
+            var draws = Deck.Draw(Hand);
+            return draws.Select(c => new MetaGame(Deck, Board.Clone(), Hand.Clone().Add(c.Key, 1), Microstates*c.Value));
         }
 
         public void PlayLand(int land)

@@ -1,6 +1,7 @@
 //Simple class to maintain some state that shouldn't go other places.  
 
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MTG
 {
@@ -23,6 +24,11 @@ namespace MTG
                 Nonlands[nonland]++;
             else
                 Nonlands[nonland] = 1;
+        }
+        
+         public Board Clone()
+        {
+            return new Board{Lands = Lands.ToDictionary(kvp => kvp.Key, kvp => kvp.Value), Nonlands = Nonlands.ToDictionary(kvp => kvp.Key, kvp => kvp.Value)};
         }
     }
 }

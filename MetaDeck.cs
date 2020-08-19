@@ -58,22 +58,9 @@ namespace MTG
             return finishedHands.ToDictionary(h => h, h => HandMicrostates(h));
         }
 
-        public int Draw(Hand hand)
+        public Dictionary<int, int> Draw(Hand hand)
         {
-            int r = _random.Next(Count);
-            foreach(var key in deckDistribution.Keys)
-            {
-                var inDeck = deckDistribution[key] - hand[key];
-                if (inDeck >= r)
-                {
-                    return key;
-                }
-
-                r -= inDeck;
-            }
-            return -1; //you're probably out of cards
+            return deckDistribution.ToDictionary(kvp => kvp.Key, kvp => kvp.Value - hand[kvp.Key]);
         }
-
-        static Random _random = new Random();
     }
 }
