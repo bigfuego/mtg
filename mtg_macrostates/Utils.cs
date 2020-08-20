@@ -20,5 +20,11 @@ namespace MTG
             return result;
         }
 
+        public static bool DictionaryEquals<T, U>(Dictionary<T, U> x, Dictionary<T, U> y) 
+            where T: struct
+            where U: struct
+        {
+            return x.Count == y.Count && !x.Except(y).Any();
+        }
     }
 }

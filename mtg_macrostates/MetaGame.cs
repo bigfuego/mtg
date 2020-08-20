@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -50,6 +51,19 @@ namespace MTG
         public void Discard(int card)
         {
             Hand[card]--;
+        }
+
+         public override bool Equals(Object obj)
+        {
+            if (!(obj is MetaGame)) return false;
+
+            var g = (MetaGame)obj;
+            return g.Board.Equals(Board) && g.Hand.Equals(Hand) && g.turn == turn;
+        }
+
+        public override int GetHashCode()
+        {   
+            return Board.GetHashCode() + Hand.GetHashCode() + Deck.GetHashCode() + turn;
         }
 
     }

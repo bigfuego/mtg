@@ -54,12 +54,12 @@ namespace MTG
 
         public override int GetHashCode()
         {   
-            int result = 0;
+            int hc = CardDistribution.Count;
             foreach(var kvp in CardDistribution)
             {
-                result += kvp.Value * (int)Math.Pow(10, kvp.Key);
+                hc=unchecked(hc*11 + kvp.GetHashCode());
             }
-            return result;
+            return hc;
         }
     }
 }

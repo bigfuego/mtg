@@ -23,6 +23,8 @@ namespace MTG
         public void SimulateTurn()
         {
             MetaGames = MetaGames.SelectMany(mg => mg.Draw()).ToList();
+            CoalesceMetaGames();
+            
             foreach (var game in MetaGames)
             {
                 var turn = game.NewTurn();
@@ -43,9 +45,13 @@ namespace MTG
             turn++;
         }
 
+        //Assumes they all have the same deck.  
         public void CoalesceMetaGames()
         {
-            throw new NotImplementedException("This is an optimization for later");
+            Console.WriteLine($"Grouping {MetaGames.Count} games");
+            var groups = MetaGames.GroupBy(mg => new {mg.Board, mg.Hand});
+            Console.WriteLine($"Collapsing to {groups.Count()} games");
+            MetaGames = groups.Select(g => new MetaGame(metadeck, g.Key.Board, g.Key.Hand, g.Aggregate(new BigInteger(0), (c, n) => c + n.Microstates))).ToList();
         }
 
         #region Logic around what to play, specific to objectives of this calculator
