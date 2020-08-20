@@ -81,13 +81,16 @@ namespace MTG
                 new Card{CardType=CardType.NONLAND, Cost=1},
                 new Card{CardType=CardType.NONLAND, Cost=1},
                 new Card{CardType=CardType.NONLAND, Cost=1},
+                new Card{CardType=CardType.NONLAND, Cost=2},
+                new Card{CardType=CardType.NONLAND, Cost=2},
+                
             });
 
-            var probabilityCalculator = new ManaTurnProbabilityCalculator(morePredictableDeck, c => c.Cost);
+            var probabilityCalculator = new ManaTurnProbabilityCalculator(Deck, c => c.Cost);
             probabilityCalculator.SimulateTurn();
             probabilityCalculator.SimulateTurn();
-            probabilityCalculator.SimulateTurn();
-            probabilityCalculator.SimulateTurn();
+            //probabilityCalculator.SimulateTurn();
+            //probabilityCalculator.SimulateTurn();
 
             var stats = probabilityCalculator.Stats;
             var landStats = stats.GetLandStats();

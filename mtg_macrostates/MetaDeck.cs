@@ -30,7 +30,6 @@ namespace MTG
             foreach (var uniqueProperty in deckDistribution.Where(p => p.Value > 0))
             {
                 var toAdd = new List<Hand>();
-                var toRemove = new List<Hand>();
 
                 foreach (var hand in hands)
                 {
@@ -40,16 +39,12 @@ namespace MTG
                             toAdd.Add(hand.Clone().Add(uniqueProperty.Key, i));
                         else
                         {
-                            toRemove.Add(hand);
                             finishedHands.Add(hand.Clone().Add(uniqueProperty.Key, i));
                         }
                     }
 
-                    continue;
                 }
 
-                foreach(var hand in toRemove)
-                    hands.Remove(hand);
                 
                 hands.AddRange(toAdd);
             }
