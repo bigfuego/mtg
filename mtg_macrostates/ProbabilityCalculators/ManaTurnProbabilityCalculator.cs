@@ -8,7 +8,7 @@ namespace MTG
     public class ManaTurnProbabilityCalculator
     {
         MetaDeck metadeck;
-        List<MetaGame> MetaGames;
+        IEnumerable<MetaGame> MetaGames;
         public ManaTurnStats Stats;
         private int turn = 0;
 
@@ -16,19 +16,16 @@ namespace MTG
         {
             this.metadeck = new MetaDeck(deck, groupBy);
             var handDistribution = metadeck.HandDistribution();
-            this.MetaGames = handDistribution.Select(hd => new MetaGame(this.metadeck, new Board(), hd.Key, hd.Value)).ToList();
+            this.MetaGames = handDistribution.Select(hd => new MetaGame(this.metadeck, new Board(), hd.Key, hd.Value));
             this.Stats = new ManaTurnStats();
         }
 
         public void SimulateTurn()
         {
-            MetaGames = MetaGames.SelectMany(mg => mg.Draw()).ToList();
-            CoalesceMetaGames();
-            
+            Draw();
             foreach (var game in MetaGames)
             {
                 var turn = game.NewTurn();
-                game.Draw();
 
                 if (GetLandToPlay(game, out int land))
                     game.PlayLand(land);    
@@ -46,12 +43,18 @@ namespace MTG
         }
 
         //Assumes they all have the same deck.  
-        public void CoalesceMetaGames()
+        public void Draw()
         {
-            Console.WriteLine($"Grouping {MetaGames.Count} games");
-            var groups = MetaGames.GroupBy(mg => new {mg.Board, mg.Hand});
-            Console.WriteLine($"Collapsing to {groups.Count()} games");
-            MetaGames = groups.Select(g => new MetaGame(metadeck, g.Key.Board, g.Key.Hand, g.Aggregate(new BigInteger(0), (c, n) => c + n.Microstates))).ToList();
+            var afterDraw = new Dictionary<(Board, Hand), MetaGame>();
+            foreach(var metagame in MetaGames)
+                foreach(var newGame in metagame.Draw())
+                {
+                    if(afterDraw.TryGetValue((newGame.Board, newGame.Hand), out MetaGame existing))
+                        existing.Microstates += newGame.Microstates;
+                    else 
+                        afterDraw.Add((newGame.Board, newGame.Hand), newGame);
+                }
+            MetaGames = afterDraw.Values;
         }
 
         #region Logic around what to play, specific to objectives of this calculator
