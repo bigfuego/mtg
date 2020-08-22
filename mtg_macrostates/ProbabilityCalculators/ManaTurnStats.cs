@@ -13,14 +13,14 @@ namespace MTG
         public void AddLandStats(IEnumerable<MetaGame> games, int turn)
         {
             Grow(turn);
-            StatsPerTurn[turn]["Mana"] = games.GroupBy(g => g.Board.Lands.Sum(kvp => kvp.Value)) //only one color in this one for now.  Need to fix later.
+            StatsPerTurn[turn]["Mana"] = games.GroupBy(g => g.Board.Lands.Count()) //only one color in this one for now.  Need to fix later.
                                               .ToDictionary(g => g.Key, g => g.Aggregate(new BigInteger(0), (c, n) => c + n.Microstates));
         }
 
         public void AddSpendStats(IEnumerable<MetaGame> games, int turn)
         {
             Grow(turn);
-            StatsPerTurn[turn]["Spend"] = games.GroupBy(g => g.Board.Nonlands.Sum(kvp => kvp.Key * kvp.Value))
+            StatsPerTurn[turn]["Spend"] = games.GroupBy(g => g.Board.NonLands.Count())
                                               .ToDictionary(g => g.Key, g => g.Aggregate(new BigInteger(0), (c, n) => c + n.Microstates));
         }
 

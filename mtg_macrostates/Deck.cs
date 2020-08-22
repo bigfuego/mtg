@@ -16,11 +16,6 @@ namespace MTG
             Shuffle();
         }
 
-        public Dictionary<T, int> GroupBy<T>(Func<Card, T> groupFunc)
-        {
-            return Cards.GroupBy(c => groupFunc(c)).ToDictionary(g => g.Key, g => g.Count());
-        }
-
         static Random _random = new Random();
         public void Shuffle()
         {

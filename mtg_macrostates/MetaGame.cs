@@ -10,15 +10,17 @@ namespace MTG
         public MetaDeck Deck;
         public Board Board;
         public Hand Hand;
+        public CardCollection Graveyard;
         public int turn = 0;
         public BigInteger Microstates;
 
-        public MetaGame(MetaDeck deck, Board board, Hand hand, BigInteger microstates)
+        public MetaGame(MetaDeck deck, Board board, CardCollection graveyard, Hand hand, BigInteger microstates)
         {
             this.Deck = deck;
             this.Board = board;
             this.Hand = hand;
             this.Microstates = microstates;
+            this.Graveyard = graveyard;
         }
 
         public int NewTurn()
@@ -29,28 +31,29 @@ namespace MTG
 
         public IEnumerable<MetaGame> Draw() //Drawing creates a whole new set of metagames
         {
-            var draws = Deck.Draw(Hand);
-            return draws.Select(c => new MetaGame(Deck, Board.Clone(), Hand.Clone().Add(c.Key, 1), Microstates*c.Value));
+            var draws = Deck.Draw(Hand, Board, Graveyard);
+            return draws.Select(c => new MetaGame(Deck, Board.Clone(), Graveyard.Clone(), Hand.Clone().Add(c.Item1, 1), Microstates*c.Item2));
         }
 
-        public void PlayLand(int land)
+        public void Play(Card card)
         {
-            Hand[land]--;
-            Board.AddLand(land);
+            Hand.Remove(card);
+            Board.Add(card);
         }
 
-        public void PlayNonLands(List<int> nonlands)
+        public void Play(IEnumerable<int> costs)
         {
-            foreach(var nonland in nonlands)
+            foreach(var cost in costs)
             {
-                Hand[nonland]--;
-                Board.AddNonLand(nonland);
+                Hand.NonLands.Remove(cost);
+                Board.NonLands.Add(cost);
             }
         }
 
-        public void Discard(int card)
+        public void Discard(int cost)
         {
-            Hand[card]--;
+            Hand.NonLands.Remove(cost);
+            Graveyard.NonLands.Add(cost);
         }
 
          public override bool Equals(Object obj)
@@ -63,7 +66,7 @@ namespace MTG
 
         public override int GetHashCode()
         {   
-            return Board.GetHashCode() + Hand.GetHashCode() + Deck.GetHashCode() + turn;
+            return Board.GetHashCode() ^ Hand.GetHashCode() + turn;
         }
 
     }

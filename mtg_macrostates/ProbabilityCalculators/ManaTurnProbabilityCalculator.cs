@@ -14,9 +14,9 @@ namespace MTG
 
         public ManaTurnProbabilityCalculator(Deck deck, Func<Card, int> groupBy)
         {
-            this.metadeck = new MetaDeck(deck, groupBy);
+            this.metadeck = new MetaDeck(deck, c => c);
             var handDistribution = metadeck.HandDistribution();
-            this.MetaGames = handDistribution.Select(hd => new MetaGame(this.metadeck, new Board(), hd.Key, hd.Value));
+            this.MetaGames = handDistribution.Select(hd => new MetaGame(this.metadeck, new Board(), new CardCollection(), hd.Key, hd.Value));
             this.Stats = new ManaTurnStats();
         }
 
@@ -27,11 +27,11 @@ namespace MTG
             {
                 var turn = game.NewTurn();
 
-                if (GetLandToPlay(game, out int land))
-                    game.PlayLand(land);    
+                if (GetLandToPlay(game, out Card land))
+                    game.Play(land);    
 
                 var nonlandsToPlay = GetNonLandsToPlay(game);
-                game.PlayNonLands(nonlandsToPlay);
+                game.Play(nonlandsToPlay);
                 if (GetDiscard(game, out int discard))
                 {
                     game.Discard(discard);
@@ -59,21 +59,23 @@ namespace MTG
 
         #region Logic around what to play, specific to objectives of this calculator
 
-        public bool GetLandToPlay(MetaGame game, out int land)
+        public bool GetLandToPlay(MetaGame game, out Card land)
         {
-            land = game.Hand[0] > 0 ? 0 : -1;
-            return land == 0;
+            var card =  new Card{CardType=CardType.PLAINS}; //TODO: Be smarter.
+            var count = game.Hand.Lands.Count( new Card{CardType=CardType.PLAINS});
+            land = count > 0 ? card : null;
+            return count > 0;
         }
 
         public List<int> GetNonLandsToPlay(MetaGame game)
         {
             var result = new List<int>();
-            var availableMana = game.Board.Lands.Sum(l => l.Value);
+            var availableMana = game.Board.Lands.Count(); //TODO: Multiple colors
             //Greedy.  Wrong.  With 5 mana, this could play a 4 instead of a 2 and 3.  
-            foreach (var cost in game.Hand.CardDistribution.Keys.Where(c => c > 0).OrderByDescending(x => x))
+            foreach (var cost in Globals.MANA_COSTS)
             {
                 var played = 0;
-                while (cost <= availableMana && played < game.Hand.CardDistribution[cost])
+                while (cost <= availableMana && played < game.Hand.NonLands.Count(cost))
                 {
                     result.Add(cost);
                     availableMana -= cost;
@@ -84,7 +86,7 @@ namespace MTG
 
         public bool GetDiscard(MetaGame game, out int discard)
         {
-            discard = game.Hand.Count > 7 ? game.Hand.Keys.Max() : -1;
+            discard = game.Hand.Count() > 7 ? Globals.MANA_COSTS.First(c => game.Hand.NonLands.Count(c) > 0) : -1;
             return discard != -1;
         }
         #endregion

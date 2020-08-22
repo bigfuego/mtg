@@ -7,20 +7,19 @@ namespace MTG
 {
     public class MetaDeck
     {
-        public Dictionary<int, int> deckDistribution = null;
+        public Dictionary<Card, int> deckDistribution = null;
         public int Count;
 
-        public MetaDeck(Deck deck, Func<Card, int> groupFunc)
+        public MetaDeck(Deck deck, Func<Card, Card> groupBy)
         {
             this.Count = deck.Count;
-            deckDistribution = deck.GroupBy(groupFunc);
+            deckDistribution = deck.Cards.GroupBy(groupBy).ToDictionary(g => g.Key, g => g.Count());
         }
 
         public BigInteger HandMicrostates(Hand hand)
         {
-            var handDistribution = hand.CardDistribution;
-            var keys = handDistribution.Keys;
-            return keys.Aggregate(new BigInteger(1), (c, n) =>  c*Utils.NChooseK(deckDistribution[n], handDistribution[n]));
+            var keys = deckDistribution.Keys;
+            return keys.Aggregate(new BigInteger(1), (c, n) =>  c*Utils.NChooseK(deckDistribution[n], hand.Count(n)));
         }
 
         public Dictionary<Hand, BigInteger> HandDistribution()
@@ -33,9 +32,9 @@ namespace MTG
 
                 foreach (var hand in hands)
                 {
-                    for (int i = 1; i <= Math.Min(uniqueProperty.Value, Globals.HAND_SIZE - hand.Count); i++)
+                    for (int i = 1; i <= Math.Min(uniqueProperty.Value, Globals.HAND_SIZE - hand.Count()); i++)
                     {      
-                        if (i < Globals.HAND_SIZE - hand.Count)  
+                        if (i < Globals.HAND_SIZE - hand.Count())  
                             toAdd.Add(hand.Clone().Add(uniqueProperty.Key, i));
                         else
                         {
@@ -52,9 +51,9 @@ namespace MTG
             return finishedHands.ToDictionary(h => h, h => HandMicrostates(h));
         }
 
-        public Dictionary<int, int> Draw(Hand hand)
+        public IEnumerable<(Card, int)> Draw(Hand hand, Board board, CardCollection graveyard)
         {
-            return deckDistribution.ToDictionary(kvp => kvp.Key, kvp => kvp.Value - hand[kvp.Key]);
+            return deckDistribution.Select(kvp => (kvp.Key, kvp.Value - hand.Count(kvp.Key) - board.Count(kvp.Key) - graveyard.Count(kvp.Key))).Where(x => x.Item2 > 0);
         }
     }
 }
